@@ -6,7 +6,7 @@ if (require.main === module) {
 
 function main() {
     console.time('Time');
-    const words = fs.readFileSync('./day-1-input.txt', 'utf-8');
+    const words = fs.readFileSync('./day-1-trebuchet/day-1-input.txt', 'utf-8');
     const wordsArray = words.split('\r\n');
     const result = getTotalCalibrationValue(wordsArray);
     console.log('Sum of all calibration values: ', result);

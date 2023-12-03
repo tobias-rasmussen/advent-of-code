@@ -8,7 +8,7 @@ if (require.main === module) {
 
 function main() {
     console.time('Time');
-    const words = fs.readFileSync('./day-2-input.txt', 'utf-8');
+    const words = fs.readFileSync('./day-2-cube-conundrum/day-2-input.txt', 'utf-8');
     const games = words.split('\r\n');
     const constraint: Constraint = {blueDie: 14, greenDie: 13, redDie: 12}; 
     const resultPart1 = sumOfPossibleGameIds(games, constraint);
