@@ -36,4 +36,17 @@ export class Game {
         && constraint.greenDie >= Math.max(...this.greenDie)
         && constraint.redDie >= Math.max(...this.redDie)
     }
+
+    public getFewestPossibleDice() {
+        return {
+            red:  Math.max(...this.redDie),
+            green: Math.max(...this.greenDie),
+            blue: Math.max(...this.blueDie)
+        };
+    }
+
+    public getPowerOfMinimumNumberOfDice(): number {
+        const fewetPossibleDice = this.getFewestPossibleDice();
+        return fewetPossibleDice.blue * fewetPossibleDice.green * fewetPossibleDice.red;
+    }
 }
