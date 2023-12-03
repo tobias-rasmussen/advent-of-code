@@ -49,4 +49,43 @@ describe('Day 3 - Part 1', () => {
 
         expect(actual).toBe(123);
     });
+
+    it('Also checks for symbols diagonally', () => {
+        const engineSchematic: string[] = [
+            '+........+',
+            '.12....32.',
+            '.92.78.28.',
+            '%........!'
+        ];
+
+        const actual = SchematicParser.sumPartNumbers(engineSchematic);
+
+        expect(actual).toBe(12 + 32 + 92 + 28);
+    });
+
+    it('Checks for symbols directly above digits', () => {
+        const engineSchematic: string[] = [
+            '+.23.....+',
+            '1......320',
+            '..+.......',
+            '.123..99..'
+        ];
+
+        const actual = SchematicParser.sumPartNumbers(engineSchematic);
+
+        expect(actual).toBe(1 + 320 + 123);
+    });
+
+    it('Checks for symbols directly below digits', () => {
+        const engineSchematic: string[] = [
+            '..23..43..',
+            '1.+..../..',
+            '....51....',
+            '..........'
+        ];
+
+        const actual = SchematicParser.sumPartNumbers(engineSchematic);
+
+        expect(actual).toBe(23 + 43);
+    });
 });
