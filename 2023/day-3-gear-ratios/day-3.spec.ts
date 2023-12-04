@@ -89,3 +89,54 @@ describe('Day 3 - Part 1', () => {
         expect(actual).toBe(23 + 43);
     });
 });
+
+describe('Day 3 - Part 2', () => {
+
+    it('Should not count numbers with only 1 adjecent * or other symbol', () => {
+        const engineSchematic: string[] = [
+            '467**114+*',
+            '..%!...+,.',
+            '%.35**633.'
+        ];
+
+        const actual = SchematicParser.sumGearRatios(engineSchematic);
+
+        expect(actual).toBe(0);
+    });
+
+    it('Should calculate gear ratio when in the middle of 2 numbers', () => {
+        const engineSchematic: string[] = [
+            '.467*114..',
+            '++++++++++',
+            '..350*633.'
+        ];
+
+        const actual = SchematicParser.sumGearRatios(engineSchematic);
+
+        expect(actual).toBe(467*114 + 350*633);
+    });
+
+    it('Should calculate gear ratio when numbers are above and below', () => {
+        const engineSchematic: string[] = [
+            '123.547.211',
+            '*....*....*',
+            '23..142.465'
+        ];
+
+        const actual = SchematicParser.sumGearRatios(engineSchematic);
+
+        expect(actual).toBe(123*23 + 547*142 + 211*465);
+    });
+
+    it('Should calculate gear ratio when numbers are diagonally placed', () => {
+        const engineSchematic: string[] = [
+            '123..765',
+            '...**...',
+            '444..709'
+        ];
+
+        const actual = SchematicParser.sumGearRatios(engineSchematic);
+
+        expect(actual).toBe(123*444 + 765*709);
+    });
+});

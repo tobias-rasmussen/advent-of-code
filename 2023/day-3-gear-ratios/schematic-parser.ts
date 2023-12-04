@@ -4,7 +4,7 @@ export class SchematicParser {
 
         for (let i = 0; i < schematic.length; i++)
             for (let j = 0; j < schematic[0].length; j++) {
-                if (!isDigit(schematic[i].charAt(j))) continue;
+                if (!SchematicParser.isDigit(schematic[i].charAt(j))) continue;
                 // i,j is the leftmost position of a new number
                 const partNumber = extractNumberToTheRight(i, j);
                 const adjecentSymbol = hasAdjecentSymbol(i, j, partNumber.length);
@@ -61,5 +61,83 @@ export class SchematicParser {
         function isSymbol(i: number, j: number): boolean {
             return !!schematic[i].charAt(j).match(/[^0-9\.]/);
         }
+    }
+
+    static sumGearRatios(schematic: string[]): number {
+        let result = 0;
+
+        for (let i = 0; i < schematic.length; i++)
+            for (let j = 0; j < schematic[0].length; j++) {
+                if (!isStar(schematic[i].charAt(j))) continue;
+                const partNumbers = extractAdjacentPartNumbers(i,j);
+                if (partNumbers.length == 2) {
+                    result += partNumbers[0] * partNumbers[1];
+                }
+        }
+        
+        return result;
+
+        function isStar(s: string): boolean {
+            return !!s.match(/[*]/);
+        }
+
+        function extractAdjacentPartNumbers(i: number, j: number): number[] {
+            const result: Array<number> = new Array();
+
+            // Check if there is a number to the right
+            if (j + 1 < schematic[i].length && SchematicParser.isDigit(schematic[i].charAt(j + 1))) {
+                result.push(extractNumber(i, j + 1))
+            }
+            // Check if there is a number to the left
+            if (j > 0 && SchematicParser.isDigit(schematic[i].charAt(j - 1))) {
+                result.push(extractNumber(i, j - 1));
+            }
+            // Check for numbers above
+            if (i > 0 ) {
+                extractNumbersFromRowAboveOrBelow(i - 1);
+            }
+            // Check for numbers below
+            if (i + 1 < schematic.length) {
+                extractNumbersFromRowAboveOrBelow(i + 1);
+            }
+            return [...result];
+
+            function extractNumbersFromRowAboveOrBelow(k: number) {
+                if (SchematicParser.isDigit(schematic[k].charAt(j))) {
+                    // It is enough to only check here and not at j+1 and j-1
+                    result.push(extractNumber(k, j));
+                } else {
+                    if (j + 1 < schematic[k].length && SchematicParser.isDigit(schematic[k].charAt(j + 1))) {
+                        // It is enough to only check here and not at j+1 and j-1
+                        result.push(extractNumber(k, j + 1));
+                    }
+                    if (j > 0 && SchematicParser.isDigit(schematic[k].charAt(j - 1))) {
+                        // It is enough to only check here and not at j+1 and j-1
+                        result.push(extractNumber(k, j - 1));
+                    }
+                }
+            }
+        }
+
+        function extractNumber(i: number, j: number): number {
+            let result = "";
+            
+            // Go as far left as possible
+            let k = 0;
+            while (SchematicParser.isDigit(schematic[i].charAt(j - 1 - k))) {
+                k++;
+            }
+            // Now go to the right, picking up digits until we reach a non-digit
+            while (SchematicParser.isDigit(schematic[i].charAt(j - k))) {
+                result += schematic[i].charAt(j - k);
+                k--;
+            }
+
+            return parseInt(result);
+        }
+    }
+
+    private static isDigit(s: string): boolean {
+        return !!s.match(/[0-9]/);
     }
 }

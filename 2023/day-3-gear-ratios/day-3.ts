@@ -12,6 +12,9 @@ function main() {
     const resultPart1 = SchematicParser.sumPartNumbers(schematics);
     console.log('Sum of all number parts with adjecent symbols: ', resultPart1);
 
+    const resultPart2 = SchematicParser.sumGearRatios(schematics);
+    console.log('Sum of all number gear ratios: ', resultPart2);
+
     console.log(`Used ${process.memoryUsage().heapUsed / 1024 / 1024} MB`);
     console.timeEnd('Time');
 }
