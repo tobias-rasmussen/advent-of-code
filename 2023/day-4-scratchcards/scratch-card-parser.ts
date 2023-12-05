@@ -9,6 +9,12 @@ export class ScratchCardParser {
     }
 
     public static pointsForCard(card: string): number {
+        let matchingWinners = ScratchCardParser.numberOfWinningNumbers(card)
+        if (matchingWinners == 0) return 0;
+        return Math.pow(2, matchingWinners - 1);
+    }
+
+    private static numberOfWinningNumbers(card: string): number {
         let matchingWinners = 0;
         
         let winningNumbers = card.split(':')[1].split('|')[0].trim().split(' ').filter((x) => x != '');
@@ -22,8 +28,21 @@ export class ScratchCardParser {
                 }
             });   
         });
+        return matchingWinners;
+    };
 
-        if (matchingWinners == 0) return 0;
-        return Math.pow(2, matchingWinners - 1);
+    public static totalCardsScratched(cards: string[]): number {
+        const totalCards = new Array<number>(cards.length).fill(1);
+        for (let i = 0; i < cards.length; i++) {
+            const winningNumbers = ScratchCardParser.numberOfWinningNumbers(cards[i]);
+            for (let n = 1; n <= winningNumbers; n++) {
+                totalCards[i + n] += totalCards[i];
+            }
+        }
+        let result = 0;
+        totalCards.forEach(element => {
+            result += element;
+        });
+        return result;
     }
 }
