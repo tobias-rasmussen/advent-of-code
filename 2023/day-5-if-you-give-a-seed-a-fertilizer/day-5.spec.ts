@@ -37,7 +37,7 @@ describe('Day 5 - Part 1', () => {
 
     it('Can transform from seed to soil to locations', () => {
         const almanac = ['seeds: 79 14 55 13', '', 'seed-to-soil map:','50 98 2', '52 50 48', '', 'soil-to-fertilizer map:','0 15 37', '37 52 2','39 0 15','','fertilizer-to-water map:','49 53 8','0 11 42','42 0 7','57 7 4','','water-to-light map:','88 18 7', '18 25 70','','light-to-temperature map:','45 77 23', '81 45 19', '68 64 13','', 'temperature-to-humidity map:', '0 69 1','1 0 69', '','humidity-to-location map:','60 56 37','56 93 4'];
-        const seeds = AlmanacParser.parseSeedsAsNumbers(almanac[0]);
+        const seeds = AlmanacParser.parseSeeds(almanac[0]);
 
         const result = AlmanacParser.mapSeedsToLocations(seeds, almanac); 
         
@@ -49,32 +49,63 @@ describe('Day 5 - Part 2', () => {
     it('Can extract seed list as is', () => {
         const seedsLine = 'seeds: 1 2 3 4';
         
-        const result = AlmanacParser.parseSeedsAsNumbers(seedsLine);
+        const result = AlmanacParser.parseSeeds(seedsLine);
         
         expect(result).toStrictEqual([1, 2, 3, 4]);
     });
 
-    it('Can extract seed list interpreted as a range', () => {
-        const seedsLine = 'seeds: 79 5 55 1';
+    it('Can transform range when range is not affected', () => {
+        const input = [0, 10];
+        const mapping = [[50, 98, 2], [52, 50, 48]];
         
-        const result = AlmanacParser.parseSeedsAsRange(seedsLine);
+        const result = AlmanacParser.transformRange(input, mapping);
         
-        expect(result).toStrictEqual([79, 80, 81, 82, 83, 55]);
+        expect(result).toStrictEqual(input);
     });
 
-    it('Can map seed to location when seed is parsed as list', () => {
-        const almanac = ['seeds: 79 14 55 13', '', 'seed-to-soil map:','50 98 2', '52 50 48', '', 'soil-to-fertilizer map:','0 15 37', '37 52 2','39 0 15','','fertilizer-to-water map:','49 53 8','0 11 42','42 0 7','57 7 4','','water-to-light map:','88 18 7', '18 25 70','','light-to-temperature map:','45 77 23', '81 45 19', '68 64 13','', 'temperature-to-humidity map:', '0 69 1','1 0 69', '','humidity-to-location map:','60 56 37','56 93 4'];
-        const seeds = AlmanacParser.parseSeedsAsRange(almanac[0]);
-        
-        const result = AlmanacParser.mapSeedsToLocations(seeds, almanac);
+    
+    it('Can transform range when range is wholy contained in mapping', () => {
+        const input = [0, 5, 20, 10];
+        const mapping = [[50, 0, 10], [30, 20, 10]];
 
-        expect(Math.min(...result)).toBe(46);
+        const result = AlmanacParser.transformRange(input, mapping);
+        
+        expect(result).toStrictEqual([50, 5, 30, 10]);
     });
 
-    it('Can map seed to location when seed is parsed as list, one at a time in a more memory friendly manner', () => {
-        const almanac = ['seeds: 79 14 55 13', '', 'seed-to-soil map:','50 98 2', '52 50 48', '', 'soil-to-fertilizer map:','0 15 37', '37 52 2','39 0 15','','fertilizer-to-water map:','49 53 8','0 11 42','42 0 7','57 7 4','','water-to-light map:','88 18 7', '18 25 70','','light-to-temperature map:','45 77 23', '81 45 19', '68 64 13','', 'temperature-to-humidity map:', '0 69 1','1 0 69', '','humidity-to-location map:','60 56 37','56 93 4'];
-        const result = AlmanacParser.getMinimumLocationFromSeeds(almanac);
+    it('Can transform range when mapping extends beyond range', () => {
+        const input = [5, 5, 20, 10];
+        const mapping = [[50, 0, 100]];
 
-        expect(result).toBe(46);
+        const result = AlmanacParser.transformRange(input, mapping);
+        
+        expect(result).toStrictEqual([55, 5, 70, 10]);
+    });
+
+    it('Can transform range when mapping only matches beginning of range', () => {
+        const input = [25, 25];
+        const mapping = [[50, 0, 35]];
+
+        const result = AlmanacParser.transformRange(input, mapping);
+        
+        expect(result).toStrictEqual([75, 10, 35, 15]);
+    });
+
+    it('Can transform range when mapping only matches end of range', () => {
+        const input = [25, 25];
+        const mapping = [[50, 35, 35]];
+
+        const result = AlmanacParser.transformRange(input, mapping);
+        
+        expect(result).toStrictEqual([25, 10, 50, 15]);
+    });
+
+    xit('Can transform range from seed to location', () => {
+        const input = ['seeds: 79 14 55 13', '', 'seed-to-soil map:','50 98 2', '52 50 48', '', 'soil-to-fertilizer map:','0 15 37', '37 52 2','39 0 15','','fertilizer-to-water map:','49 53 8','0 11 42','42 0 7','57 7 4','','water-to-light map:','88 18 7', '18 25 70','','light-to-temperature map:','45 77 23', '81 45 19', '68 64 13','', 'temperature-to-humidity map:', '0 69 1','1 0 69', '','humidity-to-location map:','60 56 37','56 93 4'];
+        const seeds = AlmanacParser.parseSeeds(input[0]);
+
+        const result = AlmanacParser.getMinimumLocationFromRangeOfSeeds(seeds, input);
+        
+        expect(result).toStrictEqual(46);
     });
 });

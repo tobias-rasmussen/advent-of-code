@@ -9,40 +9,21 @@ export class AlmanacParser {
         return result;
     }
 
-    public static getMinimumLocationFromSeeds(almanac: string[]): number {
-        let result = Infinity;
-        const seedsAsNumbers = AlmanacParser.parseSeedsAsNumbers(almanac[0]);
-
-        for (let i = 1; i < seedsAsNumbers.length; i += 2) {
-            let seeds = [];
-            for (let k = 0; k < seedsAsNumbers[i]; k++) {
-                seeds.push(seedsAsNumbers[i - 1] + k);
-                if (seeds.length == 100000) {
-                    const location: number = Math.min(...this.mapSeedsToLocations(seeds, almanac));
-                    seeds = [];
-                    console.log('i: %d, k: %d, location: %d, result: %d', i, k, location, result);
-                    if (location < result) result = location;
-                }
-            }
-            const location: number = Math.min(...this.mapSeedsToLocations(seeds, almanac));
-            if (location < result) result = location;
-        }
-        return result;
-    }
-
-    public static parseSeedsAsNumbers(seedsLine: string): number[] {
-        return seedsLine.split(':')[1].trim().split(' ').map((x) => parseInt(x));
-    }
-
-    public static parseSeedsAsRange(seedsLine: string): number[] {
-        const numbers = seedsLine.split(':')[1].trim().split(' ').map((x) => parseInt(x));
+    public static getMinimumLocationFromRangeOfSeeds(seeds: number[], almanac: string[]): number {
         let result: number[] = [];
-        for (let i = 1; i < numbers.length; i += 2) {
-            for (let k = 0; k < numbers[i]; k++) {
-                result.push(numbers[i - 1] + k);
-            }
+        for (let i = 0; i < seeds.length; i += 2) {
+            let range = [seeds[i], seeds[i+1]];
+            this.MAPPING_TYPES.forEach(mappingType => {
+                const mappings = this.extractMapping(mappingType, almanac);
+                range = this.transformRange(range, mappings);
+            });
+            result.push(...range);
         }
-        return result;
+        return result[0];
+    }
+
+    public static parseSeeds(seedsLine: string): number[] {
+        return seedsLine.split(':')[1].trim().split(' ').map((x) => parseInt(x));
     }
 
     public static transform(input: number[], mappingType: string, almanac: string[]): number[] {
@@ -63,6 +44,54 @@ export class AlmanacParser {
         return result;
     }
 
+    public static transformRange(input: number[], mappings: number[][]): number[] {
+        const result: number[] = [];
+
+        for (let i = 0; i < input.length; i += 2) {
+            const element = input[i];
+            const range = input[i+1];
+            let mappingFound = false;
+            for (let j = 0; j < mappings.length; j++) {
+                let mapping = mappings[j];
+                const mapDest = mappings[j][0];
+                const mapSrc = mappings[j][1];
+                const mapRange = mappings[j][2];
+                if (element + range - 1 < mapSrc || mapSrc + mapRange <= element) {
+                    continue;
+                }
+
+                // If the range is wholy contained in the mapping
+                if (mapSrc <= element 
+                    && element <= mapSrc + mapRange - 1
+                    && element + range <= mapSrc + mapRange) {
+                    mappingFound = true;
+                    result.push(mapDest + element - mapSrc);
+                    result.push(range);
+                    break;
+                }
+                // If range intersects with map from the left
+                if (element + range > mapSrc + mapRange) {
+                    const newRange = [element,  mapRange - range, element + mapRange - range, range - (mapRange - range)];
+                    result.push(...this.transformRange(newRange, [mapping]));
+                    mappingFound = true;
+                    break;
+                }
+                // If range intersects with map from the right
+                if (mapSrc < element + range) {
+                    const newRange = [element, mapRange - range, mapSrc, range - (mapRange - range)];
+                    result.push(...this.transformRange(newRange, [mapping]));
+                    mappingFound = true;
+                    break;
+                }
+            };
+            if (!mappingFound) {
+                result.push(element);
+                result.push(range);
+            }
+        }
+        return result;
+    }
+ 
     private static extractMapping(mappingType: string, almanac: string[]): number[][] {
         const result: number[][] = [];
         let isParsing = false;

@@ -9,7 +9,7 @@ function main() {
     console.time('Time');
     const input = fs.readFileSync('./day-5-if-you-give-a-seed-a-fertilizer/day-5-input.txt', 'utf-8');
     const almanac = input.split('\r\n');
-    const seedsAsList = AlmanacParser.parseSeedsAsNumbers(almanac[0]);
+    const seedsAsList = AlmanacParser.parseSeeds(almanac[0]);
     const resultPart1 = AlmanacParser.mapSeedsToLocations(seedsAsList, almanac);
     console.log('Lowest location number that corresponds to any of the initial seed numbers: ', Math.min(...resultPart1));
 
